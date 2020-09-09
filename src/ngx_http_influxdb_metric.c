@@ -79,8 +79,8 @@ ngx_int_t ngx_http_influxdb_metric_push(ngx_pool_t *pool,
   
   size_t line_size = measurement.len + 
                      ngx_strlen(",server_name=") + m->server_name.len + ngx_strlen(",") +
-                     ngx_strlen(",uri=\"")  + m->uri.len + ngx_strlen("\",") +
-                     ngx_strlen(",method=\"") + m->method.len + ngx_strlen("\",") +
+                     ngx_strlen(",uri=")  + m->uri.len + ngx_strlen(",") +
+                     ngx_strlen(",method=") + m->method.len + ngx_strlen(",") +
                      ngx_strlen(",status=") + NGX_INT_T_LEN + ngx_strlen(" ");
 
   // Dynamic Fields
@@ -96,8 +96,8 @@ ngx_int_t ngx_http_influxdb_metric_push(ngx_pool_t *pool,
   ngx_buf_t *buf = create_temp_char_buf(pool, line_size);
 
   (void)ngx_sprintf(buf->last,
-                    "%V,server_name=%V,uri=\"%V\",method=\"%V\",status=%i "
-                    "%V,bytes_sent=%O,header_bytes_sent=%z,body_bytes_sent=%O,request_time=%V",
+                    "%V,server_name=%V,uri=%V,method=%V,status=%i "
+                    "%Vbytes_sent=%O,header_bytes_sent=%z,body_bytes_sent=%O,request_time=%V",
                     &measurement, &m->server_name, &m->uri, &m->method, m->status, 
                     &dynamic_fields, m->bytes_sent, m->header_bytes_sent, m->body_bytes_sent,
                     &m->request_time);
