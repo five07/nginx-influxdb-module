@@ -73,36 +73,34 @@ ngx_int_t ngx_http_influxdb_metric_push(ngx_pool_t *pool,
                                         ngx_str_t host, ngx_uint_t port,
                                         ngx_str_t measurement,
                                         ngx_str_t dynamic_fields) {
-  // Measurement + tags + separator
-  size_t line_size = measurement.len + ngx_strlen(",server_name=") +
-                     m->server_name.len + ngx_strlen(" ");
+
+
+  // TODO - add dynamic_tags
+  
+  size_t line_size = measurement.len + 
+                     ngx_strlen(",server_name=") + m->server_name.len + ngx_strlen(",") +
+                     ngx_strlen(",uri=\"")  + m->uri.len + ngx_strlen("\",") +
+                     ngx_strlen(",method=\"") + m->method.len + ngx_strlen("\",") +
+                     ngx_strlen(",status=") + NGX_INT_T_LEN + ngx_strlen(" ");
 
   // Dynamic Fields
   line_size += dynamic_fields.len;
 
   // Static fields + timestamp
   line_size +=
-      ngx_strlen("method=\"") + m->method.len + ngx_strlen("\",status=") +
-      NGX_INT_T_LEN + ngx_strlen(",bytes_sent=") + sizeof(off_t) +
-      ngx_strlen(",body_bytes_sent=") + sizeof(off_t) +
+      ngx_strlen("bytes_sent=") + sizeof(off_t) +
       ngx_strlen(",header_bytes_sent=") + sizeof(size_t) +
-      ngx_strlen(",request_length=") + sizeof(off_t) + ngx_strlen(",uri=\"") +
-      m->uri.len + ngx_strlen("\",extension=\"") + m->extension.len +
-      ngx_strlen("\",content_type=\"") + m->content_type.len +
-      ngx_strlen("\",request_time=") + m->request_time.len;
+      ngx_strlen(",body_bytes_sent=") + sizeof(off_t) +
+      ngx_strlen(",request_time=") + m->request_time.len;
 
   ngx_buf_t *buf = create_temp_char_buf(pool, line_size);
 
   (void)ngx_sprintf(buf->last,
-                    "%V,server_name=%V "
-                    "%Vmethod=\"%V\",status=%i,bytes_sent=%O,body_"
-                    "bytes_sent=%O,header_"
-                    "bytes_sent=%z,request_length=%O,uri=\"%V\",extension=\"%"
-                    "V\",content_type=\"%V\",request_time=%V",
-                    &measurement, &m->server_name, &dynamic_fields, &m->method,
-                    m->status, m->bytes_sent, m->body_bytes_sent,
-                    m->header_bytes_sent, m->request_length, &m->uri,
-                    &m->extension, &m->content_type, &m->request_time);
+                    "%V,server_name=%V,uri=\"%V\",method=\"%V\",status=%i "
+                    "%V,bytes_sent=%O,header_bytes_sent=%z,body_bytes_sent=%O,request_time=%V",
+                    &measurement, &m->server_name, &m->uri, &m->method, m->status, 
+                    &dynamic_fields, m->bytes_sent, m->header_bytes_sent, m->body_bytes_sent,
+                    &m->request_time);
 
   struct sockaddr_in servaddr;
   int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
