@@ -51,7 +51,7 @@ void ngx_http_influxdb_metric_init(ngx_pool_t *pool,
 
   // escape the URI
 
-  uintptr_t escape 
+  uintptr_t escape;
   u_char *escaped_uri;
 
   escape = 2 * ngx_escape_uri(NULL, req->uri.data, req->uri.len, 
