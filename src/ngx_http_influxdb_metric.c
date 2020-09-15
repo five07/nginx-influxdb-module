@@ -41,13 +41,17 @@ void ngx_http_influxdb_metric_init(ngx_pool_t *pool,
   metric->header_bytes_sent = req->header_size;
   metric->request_length = req->request_length;
   metric->extension = req->exten;
-  metric->uri = req->unparsed_uri;
+  //metric->uri = req->unparsed_uri;
   metric->status = req->headers_out.status;
   metric->bytes_sent = req->connection->sent;
   size_t bbs = req->connection->sent - req->header_size;
   metric->body_bytes_sent = bbs > 0 ? bbs : 0;
 
   metric->content_type = req->headers_out.content_type;
+
+  u_char *escaped_uri;
+  escaped_uri = (u_char *) ngx_escape_uri(escaped_uri, r->uri.data, r->uri.len, NGX_ESCAPE_URI);
+  metric->uri = escaped_uri;
 
   // request time (how long we are dealing with the request) {{{
   ngx_time_t *tp;
