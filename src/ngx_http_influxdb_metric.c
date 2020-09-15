@@ -49,7 +49,14 @@ void ngx_http_influxdb_metric_init(ngx_pool_t *pool,
 
   metric->content_type = req->headers_out.content_type;
 
+  // escape the URI
+
+  uintptr_t escape 
   u_char *escaped_uri;
+
+  escape = 2 * ngx_escape_uri(NULL, req->uri.data, req->uri.len, 
+                              NGX_ESCAPE_URI);
+  escaped_uri = ngx_pcalloc(pool, escape);
   escaped_uri = (u_char *) ngx_escape_uri(escaped_uri, req->uri.data, req->uri.len, 
                                           NGX_ESCAPE_URI);
   metric->uri.data = escaped_uri;
