@@ -51,7 +51,8 @@ void ngx_http_influxdb_metric_init(ngx_pool_t *pool,
 
   u_char *escaped_uri;
   escaped_uri = (u_char *) ngx_escape_uri(escaped_uri, r->uri.data, r->uri.len, NGX_ESCAPE_URI);
-  metric->uri = escaped_uri;
+  metric->uri.data = escaped_uri;
+  metric->uri.len = ngx_strlen(escaped_uri);
 
   // request time (how long we are dealing with the request) {{{
   ngx_time_t *tp;
