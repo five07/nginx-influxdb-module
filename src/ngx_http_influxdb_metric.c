@@ -50,12 +50,12 @@ void ngx_http_influxdb_metric_init(ngx_pool_t *pool,
 
   // escape the URI
 
-  char* rest;
-  char* token = strtok_r((char *)req->uri.data, " ", &rest);
+  char* rest;
+  char* token = strtok_r((char *)req->uri.data, " ", &rest);
   token = strtok_r(token, "=", &rest);
   metric->uri.data = (u_char *)token;
   metric->uri.len = ngx_strlen(token);
-  
+
   // request time (how long we are dealing with the request) {{{
   ngx_time_t *tp;
   ngx_msec_int_t ms;
